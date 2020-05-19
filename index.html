@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<script src="http://code.jquery.com/jquery.min.js"></script>
+
+<script>
+
+var fish = [[3079, 'River', 'Tiny', 'All day'], [4095, 'River', 'Tiny', '9am - 4pm'], [4095, 'River', 'Small', 'All day'], [4095, 'River', 'Medium-small', '4pm - 9am'], [4095, 'Pond', 'Medium-large', 'All day'], [4095, 'Pond', 'Medium-large', '4pm - 9am'], [4095, 'Pond', 'Tiny', 'All day'], [4095, 'Pond', 'Tiny', '9am - 4pm'], [4095, 'Pond', 'Small', '9am - 4pm'], [248, 'Pond', 'Tiny', 'All day'], [504, 'Pond', 'Small', 'All day'], [384, 'River', 'Medium-large', '4pm - 9am'], [1016, 'River', 'Large', '9pm - 4am'], [124, 'Pond', 'Tiny', 'All day'], [240, 'Pond', 'Small', 'All day'], [4095, 'River', 'Small', '4pm - 9am'], [28, 'River', 'Small', 'All day'], [1008, 'Pond', 'Medium-large', '4pm - 9am'], [224, 'Pond', 'Large', '9am - 4pm'], [4095, 'River', 'Small', '9am - 4pm'], [3591, 'River', 'Medium-small', 'All day'], [4095, 'River', 'Medium-large', 'All day'], [992, 'River', 'Medium-small', 'All day'], [3840, 'River', 'Large', 'All day'], [2051, 'River', 'Small', 'All day'], [448, 'River', 'Medium-small', 'All day'], [1852, 'River (Clifftop) Pond', 'Medium-small', '4pm - 9am'], [1852, 'River (Clifftop) Pond', 'Medium-small', '4pm - 9am'], [1820, 'River (Clifftop)', 'Medium-small', '4pm - 9am'], [2055, 'River (Clifftop)', 'Large', '4pm - 9am'], [256, 'River (Mouth)', 'Medium-large', 'All day'], [256, 'River (Mouth)', 'Huge', 'All day'], [1792, 'River', 'Small', '4pm - 9am'], [2040, 'River', 'Tiny', '9am - 4pm'], [496, 'River', 'Tiny', '9am - 4pm'], [1008, 'River', 'Small', '4pm - 9am'], [1008, 'River', 'Small', '9am - 4pm'], [2040, 'River', 'Tiny', '9am - 4pm'], [1008, 'River', 'Tiny', '9am - 4pm'], [480, 'River', 'Small', '9am - 4pm &amp; 9pm - 4am'], [480, 'River', 'Medium-large', '4pm - 9am'], [480, 'River', 'Large', '4am - 9pm'], [480, 'Pond', 'Huge', '4pm - 9am'], [480, 'River', 'Huge', '4pm - 9am'], [480, 'River', 'Medium-large', '9pm - 4am'], [3847, 'River (Mouth)', 'Huge', 'All day'], [2055, 'Sea', 'Tiny', 'All day'], [2040, 'Sea', 'Tiny', 'All day'], [504, 'Sea', 'Tiny', 'All day'], [504, 'Sea', 'Small', 'All day'], [504, 'Sea', 'Small', 'All day'], [192, 'Sea', 'Huge', '4am - 9pm'], [2040, 'Sea', 'Medium-small', 'All day'], [3075, 'Sea', 'Medium-small', '6pm - 4am'], [448, 'Sea', 'Medium-small', 'All day'], [4095, 'Sea', 'Small', '4am - 9pm'], [4095, 'Sea', 'Small', 'All day'], [2044, 'Sea', 'Medium-small', 'All day'], [4095, 'Sea', 'Large', 'All day'], [4095, 'Sea', 'Medium-large', 'All day'], [3599, 'Sea', 'Medium-small', 'All day'], [4095, 'Sea', 'Large', 'All day'], [2303, 'Sea', 'Medium-small', 'All day'], [896, 'Sea', 'Thin', 'All day'], [992, 'Sea', 'Thin', 'All day'], [3087, 'Pier', 'Huge', 'All day'], [3535, 'Pier', 'Huge', 'All day'], [1008, 'Pier', 'Large', 'All day'], [1008, 'Pier', 'Large', 'All day'], [448, 'Sea', 'Huge with fin', '4am - 9pm'], [1920, 'Sea', 'Large', '4am - 9pm'], [480, 'Sea', 'Huge with fin', '4pm - 9am'], [480, 'Sea', 'Huge with fin', '4pm - 9am'], [480, 'Sea', 'Huge with fin', '4pm - 9am'], [480, 'Sea', 'Huge with fin', 'All day'], [480, 'Sea', 'Medium with fin', 'All day'], [3079, 'Sea', 'Medium-large', '4pm - 9am'], [2079, 'Sea', 'Huge', 'All day'], [4095, 'Sea', 'Small', '9pm - 4am'], [4095, 'Sea (Raining)', 'Huge', 'All day']]
+
+var selected = [...Array(80).keys()]
+
+function is_in_month(f, m) {
+	if (f[0] & (2 ** (m-1))) {
+		return true
+	} else {
+		return false
+	}
+}
+
+
+function check_fish(n) {
+	// Get the checkbox
+	var checkbox = document.getElementById("check-".concat(n.toString(10)))
+
+	if (checkbox.checked == true) {
+		selected = selected.filter(e => e !== n)
+	} else {
+		selected.push(n)
+	}
+}
+
+function uncheck() {
+	$(':checkbox:checked').prop('checked',false);
+}
+
+function run_fish() {
+	// Get the table.
+	var table = document.getElementById("fish-table")
+	table.removeChild(table.getElementsByTagName("tbody")[0])
+
+	// Sort the selection
+	l = selected.sort(function(a, b) { return a - b; })
+
+	// Get month TODO
+	m = 5
+
+	var table_body = document.createElement("tbody")
+
+
+	for (var i = 0; i < l.length; i++) {
+		//console.log(is_in_month(fish[l[i]], 1))
+		if (is_in_month(fish[l[i]], m)) {
+			var row = document.createElement("tr");
+			
+			fish[l[i]].slice(1, 81).forEach(function(cellData) {
+				var cell = document.createElement("td");
+				cell.appendChild(document.createTextNode(cellData));
+				row.appendChild(cell);
+			});
+			
+			table_body.appendChild(row)
+		}
+	}
+
+	table.appendChild(table_body)
+
+}
+
+
+function fish_save_state() {
+	var n = 0;
+	selected.forEach(function(val) {
+		n = n + (2**val)
+		console.log(n)
+		console.log(val)
+	})
+	console.log(n.toString(2))
+}
+
+
+
+</script>
+</head>
+
+<body onLoad="uncheck()">
+
+	<table>
+		<tr>
+			<th><input type="checkbox" id="check-0" onclick="check_fish(0)" /></th>
+			<th><input type="checkbox" id="check-5" onclick="check_fish(5)" /></th>
+			<th><input type="checkbox" id="check-10" onclick="check_fish(10)" /></th>
+			<th><input type="checkbox" id="check-15" onclick="check_fish(15)" /></th>
+			<th><input type="checkbox" id="check-20" onclick="check_fish(20)" /></th>
+			<th><input type="checkbox" id="check-25" onclick="check_fish(25)" /></th>
+			<th><input type="checkbox" id="check-30" onclick="check_fish(30)" /></th>
+			<th><input type="checkbox" id="check-35" onclick="check_fish(35)" /></th>
+			<th><input type="checkbox" id="check-40" onclick="check_fish(40)" /></th>
+			<th><input type="checkbox" id="check-45" onclick="check_fish(45)" /></th>
+			<th><input type="checkbox" id="check-50" onclick="check_fish(50)" /></th>
+			<th><input type="checkbox" id="check-55" onclick="check_fish(55)" /></th>
+			<th><input type="checkbox" id="check-60" onclick="check_fish(60)" /></th>
+			<th><input type="checkbox" id="check-65" onclick="check_fish(65)" /></th>
+			<th><input type="checkbox" id="check-70" onclick="check_fish(70)" /></th>
+			<th><input type="checkbox" id="check-75" onclick="check_fish(75)" /></th>
+		</tr>
+		<tr>
+			<th><input type="checkbox" id="check-1" onclick="check_fish(1)" /></th>
+			<th><input type="checkbox" id="check-6" onclick="check_fish(6)" /></th>
+			<th><input type="checkbox" id="check-11" onclick="check_fish(11)" /></th>
+			<th><input type="checkbox" id="check-16" onclick="check_fish(16)" /></th>
+			<th><input type="checkbox" id="check-21" onclick="check_fish(21)" /></th>
+			<th><input type="checkbox" id="check-26" onclick="check_fish(26)" /></th>
+			<th><input type="checkbox" id="check-31" onclick="check_fish(31)" /></th>
+			<th><input type="checkbox" id="check-36" onclick="check_fish(36)" /></th>
+			<th><input type="checkbox" id="check-41" onclick="check_fish(41)" /></th>
+			<th><input type="checkbox" id="check-46" onclick="check_fish(46)" /></th>
+			<th><input type="checkbox" id="check-51" onclick="check_fish(51)" /></th>
+			<th><input type="checkbox" id="check-56" onclick="check_fish(56)" /></th>
+			<th><input type="checkbox" id="check-61" onclick="check_fish(61)" /></th>
+			<th><input type="checkbox" id="check-66" onclick="check_fish(66)" /></th>
+			<th><input type="checkbox" id="check-71" onclick="check_fish(71)" /></th>
+			<th><input type="checkbox" id="check-76" onclick="check_fish(76)" /></th>
+		</tr>
+		<tr>
+			<th><input type="checkbox" id="check-2" onclick="check_fish(2)" /></th>
+			<th><input type="checkbox" id="check-7" onclick="check_fish(7)" /></th>
+			<th><input type="checkbox" id="check-12" onclick="check_fish(12)" /></th>
+			<th><input type="checkbox" id="check-17" onclick="check_fish(17)" /></th>
+			<th><input type="checkbox" id="check-22" onclick="check_fish(22)" /></th>
+			<th><input type="checkbox" id="check-27" onclick="check_fish(27)" /></th>
+			<th><input type="checkbox" id="check-32" onclick="check_fish(32)" /></th>
+			<th><input type="checkbox" id="check-37" onclick="check_fish(37)" /></th>
+			<th><input type="checkbox" id="check-42" onclick="check_fish(42)" /></th>
+			<th><input type="checkbox" id="check-47" onclick="check_fish(47)" /></th>
+			<th><input type="checkbox" id="check-52" onclick="check_fish(52)" /></th>
+			<th><input type="checkbox" id="check-57" onclick="check_fish(57)" /></th>
+			<th><input type="checkbox" id="check-62" onclick="check_fish(62)" /></th>
+			<th><input type="checkbox" id="check-67" onclick="check_fish(67)" /></th>
+			<th><input type="checkbox" id="check-72" onclick="check_fish(72)" /></th>
+			<th><input type="checkbox" id="check-77" onclick="check_fish(77)" /></th>
+		</tr>
+		<tr>
+			<th><input type="checkbox" id="check-3" onclick="check_fish(3)" /></th>
+			<th><input type="checkbox" id="check-8" onclick="check_fish(8)" /></th>
+			<th><input type="checkbox" id="check-13" onclick="check_fish(13)" /></th>
+			<th><input type="checkbox" id="check-18" onclick="check_fish(18)" /></th>
+			<th><input type="checkbox" id="check-23" onclick="check_fish(23)" /></th>
+			<th><input type="checkbox" id="check-28" onclick="check_fish(28)" /></th>
+			<th><input type="checkbox" id="check-33" onclick="check_fish(33)" /></th>
+			<th><input type="checkbox" id="check-38" onclick="check_fish(38)" /></th>
+			<th><input type="checkbox" id="check-43" onclick="check_fish(43)" /></th>
+			<th><input type="checkbox" id="check-48" onclick="check_fish(48)" /></th>
+			<th><input type="checkbox" id="check-53" onclick="check_fish(53)" /></th>
+			<th><input type="checkbox" id="check-58" onclick="check_fish(58)" /></th>
+			<th><input type="checkbox" id="check-63" onclick="check_fish(63)" /></th>
+			<th><input type="checkbox" id="check-68" onclick="check_fish(68)" /></th>
+			<th><input type="checkbox" id="check-73" onclick="check_fish(73)" /></th>
+			<th><input type="checkbox" id="check-78" onclick="check_fish(78)" /></th>
+		</tr>
+		<tr>
+			<th><input type="checkbox" id="check-4" onclick="check_fish(4)" /></th>
+			<th><input type="checkbox" id="check-9" onclick="check_fish(9)" /></th>
+			<th><input type="checkbox" id="check-14" onclick="check_fish(14)" /></th>
+			<th><input type="checkbox" id="check-19" onclick="check_fish(19)" /></th>
+			<th><input type="checkbox" id="check-24" onclick="check_fish(24)" /></th>
+			<th><input type="checkbox" id="check-29" onclick="check_fish(29)" /></th>
+			<th><input type="checkbox" id="check-34" onclick="check_fish(34)" /></th>
+			<th><input type="checkbox" id="check-39" onclick="check_fish(39)" /></th>
+			<th><input type="checkbox" id="check-44" onclick="check_fish(44)" /></th>
+			<th><input type="checkbox" id="check-49" onclick="check_fish(49)" /></th>
+			<th><input type="checkbox" id="check-54" onclick="check_fish(54)" /></th>
+			<th><input type="checkbox" id="check-59" onclick="check_fish(59)" /></th>
+			<th><input type="checkbox" id="check-64" onclick="check_fish(64)" /></th>
+			<th><input type="checkbox" id="check-69" onclick="check_fish(69)" /></th>
+			<th><input type="checkbox" id="check-74" onclick="check_fish(74)" /></th>
+			<th><input type="checkbox" id="check-79" onclick="check_fish(79)" /></th>
+		</tr>
+	</table>
+
+	<br/>
+
+	<button type="button" onclick="run_fish()">Go</button>
+
+	<br/>
+	<br/>
+
+	<table id="fish-table">
+		<tbody>
+		</tbody>
+	</table>
+
+</body>
+
+</html>
+
