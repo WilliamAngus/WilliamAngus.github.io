@@ -10,6 +10,8 @@ var fish = [[3079, 'River', 'Tiny', 'All day'], [4095, 'River', 'Tiny', '9am - 4
 
 var selected = [...Array(80).keys()]
 
+var password = ""
+
 function is_in_month(f, m) {
 	if (f[0] & (2 ** (m-1))) {
 		return true
@@ -26,12 +28,17 @@ function check_fish(n) {
 	if (checkbox.checked == true) {
 		selected = selected.filter(e => e !== n)
 	} else {
-		selected.push(n)
+		if (!selected.includes(n)) {
+			selected.push(n)
+		}
 	}
+
+	fish_save_state()
 }
 
 function uncheck() {
 	$(':checkbox:checked').prop('checked',false);
+	fish_save_state()
 }
 
 function run_fish() {
@@ -42,14 +49,13 @@ function run_fish() {
 	// Sort the selection
 	l = selected.sort(function(a, b) { return a - b; })
 
-	// Get month TODO
-	m = 5
+	// Get month
+	m = parseInt(document.getElementById("months").value, 10)
 
 	var table_body = document.createElement("tbody")
 
 
 	for (var i = 0; i < l.length; i++) {
-		//console.log(is_in_month(fish[l[i]], 1))
 		if (is_in_month(fish[l[i]], m)) {
 			var row = document.createElement("tr");
 			
@@ -68,14 +74,92 @@ function run_fish() {
 }
 
 
+
 function fish_save_state() {
-	var n = 0;
-	selected.forEach(function(val) {
-		n = n + (2**val)
-		console.log(n)
-		console.log(val)
-	})
-	console.log(n.toString(2))
+	var new_pass = ""
+	// 5 bits to one digit in base-32.
+	for (var i = 0; i < 80; i=i+5) {
+		var n = 0;
+		if (!selected.includes(i)) {
+			n = n + 1
+		}
+		if (!selected.includes(i+1)) {
+			n = n + 2
+		}
+		if (!selected.includes(i+2)) {
+			n = n + 4
+		}
+		if (!selected.includes(i+3)) {
+			n = n + 8
+		}
+		if (!selected.includes(i+4)) {
+			n = n + 16
+		}
+		new_pass = new_pass.concat(n.toString(32))
+	}
+	password = new_pass
+	// Get the textinput
+	document.getElementById("fishpassword").value = password;
+}
+
+
+function fish_load_pass(p) {
+	for (var i = 0; i < 16; i++) {
+		var s = p[i]
+		var b = parseInt(s, 32).toString(2).padStart(5, "0")
+		var n = i*5
+		var checkbox = document.getElementById("check-".concat(n.toString(10)))
+		if (b[4] === "1") {
+			checkbox.checked = true;
+		} else {
+			checkbox.checked = false;
+		}
+		check_fish(n)
+
+		n = i*5 + 1
+		checkbox = document.getElementById("check-".concat(n.toString(10)))
+		if (b[3] === "1") {
+			checkbox.checked = true;
+		} else {
+			checkbox.checked = false;
+		}
+		check_fish(n)
+
+		n = i*5 + 2
+		checkbox = document.getElementById("check-".concat(n.toString(10)))
+		if (b[2] === "1") {
+			checkbox.checked = true;
+		} else {
+			checkbox.checked = false;
+		}
+		check_fish(n)
+
+		n = i*5 + 3
+		checkbox = document.getElementById("check-".concat(n.toString(10)))
+		if (b[1] === "1") {
+			checkbox.checked = true;
+		} else {
+			checkbox.checked = false;
+		}
+		check_fish(n)
+
+		n = i*5 + 4
+		checkbox = document.getElementById("check-".concat(n.toString(10)))
+		if (b[0] === "1") {
+			checkbox.checked = true;
+		} else {
+			checkbox.checked = false;
+		}
+		check_fish(n)
+	}
+
+	password = p
+}
+
+
+function fish_load_pass_button() {
+	console.log(document.getElementById("fishpassword").value)
+	fish_load_pass(document.getElementById("fishpassword").value)
 }
 
 
@@ -83,7 +167,30 @@ function fish_save_state() {
 </script>
 </head>
 
-<body onLoad="uncheck()">
+<body onLoad="uncheck()" style="background-color:black; color: white;">
+
+	<INPUT type="text" id="fishpassword" />
+	<button type="button" onclick="fish_load_pass_button()">Load</button>
+
+
+	<br />
+	<br />
+	<select id="months">
+		<option value="1">January</option>
+		<option value="2">February</option>
+		<option value="3">March</option>
+		<option value="4">April</option>
+		<option value="5">May</option>
+		<option value="6">June</option>
+		<option value="7">July</option>
+		<option value="8">August</option>
+		<option value="9">September</option>
+		<option value="10">October</option>
+		<option value="11">November</option>
+		<option value="12">December</option>
+	</select>
+	<br />
+	<br />
 
 	<table>
 		<tr>
@@ -189,6 +296,7 @@ function fish_save_state() {
 		<tbody>
 		</tbody>
 	</table>
+
 
 </body>
 
