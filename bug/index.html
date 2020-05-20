@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<script src="http://code.jquery.com/jquery.min.js"></script>
+
+<script>
+
+var bug = [[3903, 'Flying', '4am - 7pm'], [828, 'Flying', '4am - 7pm'], [508, 'Flying', '4am - 7pm'], [60, 'Flying by hybrid flowers', '4am - 7pm'], [248, 'Flying', '4am - 7pm'], [4095, 'Flying', '8am - 7pm'], [240, 'Flying', '4am - 7pm'], [1792, 'Flying', '4am - 5pm'], [2535, 'Flying', '5pm - 8am'], [504, 'Flying', '8am - 5pm'], [2555, 'Flying', '8am - 5pm'], [496, 'Flying', '8am - 4pm'], [4095, 'Flying near light sources', '7pm - 4am'], [504, 'On trees', '7pm - 4am'], [504, 'Flying', '8am - 4pm'], [2040, 'On the ground', '8am - 7pm'], [1920, 'On the ground', '8am - 7pm'], [1920, 'On the ground', '8am - 7pm'], [448, 'On the ground', '8am - 5pm'], [1792, 'On the ground', '5pm - 8am'], [768, 'On the ground', '5pm - 8am'], [2044, 'On flowers', '8am - 5pm'], [2044, 'On white flowers', '8am - 5pm'], [124, 'Flying', '8am - 5pm'], [4095, 'Shaking trees', 'All day'], [192, 'On trees', '8am - 5pm'], [192, 'On trees', '8am - 5pm'], [192, 'On trees', '8am - 5pm'], [384, 'On trees', '8am - 5pm'], [192, 'On trees', '4am - 8am &amp; 4pm - 7pm'], [192, 'On trees', 'All day'], [768, 'Flying', '8am - 7pm'], [1008, 'Flying', '8am - 5pm'], [1008, 'Flying', '8am - 5pm'], [3075, 'Flying', 'All day'], [32, 'Flying', '7pm - 4am'], [3103, 'Underground', 'All day'], [496, 'On fresh water', '8am - 7pm'], [496, 'On fresh water', '8am - 7pm'], [504, 'On fresh water', '7pm - 8am'], [1020, 'On flowers', 'All day'], [1020, 'On flowers', '7pm - 8am'], [572, 'On flowers', '8am - 5pm'], [1022, 'On the ground', 'All day'], [248, 'On tree stumps', 'All day'], [1840, 'On tree stumps', 'All day'], [4095, 'On tree stumps', 'All day'], [496, 'On tree stumps', 'All day'], [192, 'On palm trees', 'All day'], [2051, 'Rolling snowballs along the ground', 'All day'], [448, 'On the ground', 'All day'], [192, 'On trees', '11pm - 8am'], [224, 'On trees', 'All day'], [480, 'On palm trees', '5pm - 8am'], [192, 'On trees', 'All day'], [192, 'On trees', 'All day'], [192, 'On trees', '11pm - 8am'], [480, 'On trees', '7pm - 8am'], [192, 'On palm trees', '5pm - 8am'], [192, 'On palm trees', '5pm - 8am'], [192, 'On palm trees', '5pm - 8am'], [192, 'On trees', '5pm - 8am'], [192, 'On palm trees', '5pm - 8am'], [192, 'On palm trees', '5pm - 8am'], [192, 'On palm trees', '5pm - 8am'], [1984, 'On trees', '4am - 8am &amp; 5pm - 7pm'], [448, 'Disguised as leaves', 'All day'], [4095, 'Shaking trees', 'All day'], [4095, 'On rotten food', 'All day'], [4095, 'Disguised as shells', '7pm - 8am'], [4095, 'On rocks at the beach', 'All day'], [4095, 'On trash', 'All day'], [480, 'Flying', '5pm - 4am'], [2040, 'On villagers', 'All day'], [4095, 'On rocks and bushes during rain', 'All day'], [3903, 'Hitting rocks', '11pm - 4pm'], [3903, 'Hitting rocks', '4pm - 11pm'], [4095, 'Shaking trees', '7pm - 8am'], [3087, 'On the ground', '7pm - 4am'], [1008, 'On the ground', '7pm - 4am']]
+
+var selected = [...Array(80).keys()]
+
+var password = ""
+
+function is_in_month(f, m) {
+	if (f[0] & (2 ** (m-1))) {
+		return true
+	} else {
+		return false
+	}
+}
+
+
+function check_bug(n) {
+	// Get the checkbox
+	var checkbox = document.getElementById("check-".concat(n.toString(10)))
+
+	if (checkbox.checked == true) {
+		selected = selected.filter(e => e !== n)
+	} else {
+		if (!selected.includes(n)) {
+			selected.push(n)
+		}
+	}
+
+	bug_save_state()
+}
+
+function uncheck() {
+	$(':checkbox:checked').prop('checked',false);
+	bug_save_state()
+}
+
+function run_bug() {
+	// Get the table.
+	var table = document.getElementById("bug-table")
+	table.removeChild(table.getElementsByTagName("tbody")[0])
+
+	// Sort the selection
+	l = selected.sort(function(a, b) { return a - b; })
+
+	// Get month
+	m = parseInt(document.getElementById("months").value, 10)
+
+	var table_body = document.createElement("tbody")
+
+
+	for (var i = 0; i < l.length; i++) {
+		if (is_in_month(bug[l[i]], m)) {
+			var row = document.createElement("tr");
+			
+			bug[l[i]].slice(1, 81).forEach(function(cellData) {
+				var cell = document.createElement("td");
+				cell.appendChild(document.createTextNode(cellData));
+				row.appendChild(cell);
+			});
+			
+			table_body.appendChild(row)
+		}
+	}
+
+	table.appendChild(table_body)
+
+}
+
+
+
+function bug_save_state() {
+	var new_pass = ""
+	// 5 bits to one digit in base-32.
+	for (var i = 0; i < 80; i=i+5) {
+		var n = 0;
+		if (!selected.includes(i)) {
+			n = n + 1
+		}
+		if (!selected.includes(i+1)) {
+			n = n + 2
+		}
+		if (!selected.includes(i+2)) {
+			n = n + 4
+		}
+		if (!selected.includes(i+3)) {
+			n = n + 8
+		}
+		if (!selected.includes(i+4)) {
+			n = n + 16
+		}
+		new_pass = new_pass.concat(n.toString(32))
+	}
+	password = new_pass
+	// Get the textinput
+	document.getElementById("bugpassword").value = password;
+}
+
+
+function bug_load_pass(p) {
+	for (var i = 0; i < 16; i++) {
+		var s = p[i]
+		var b = parseInt(s, 32).toString(2).padStart(5, "0")
+		var n = i*5
+		var checkbox = document.getElementById("check-".concat(n.toString(10)))
+		if (b[4] === "1") {
+			checkbox.checked = true;
+		} else {
+			checkbox.checked = false;
+		}
+		check_bug(n)
+
+		n = i*5 + 1
+		checkbox = document.getElementById("check-".concat(n.toString(10)))
+		if (b[3] === "1") {
+			checkbox.checked = true;
+		} else {
+			checkbox.checked = false;
+		}
+		check_bug(n)
+
+		n = i*5 + 2
+		checkbox = document.getElementById("check-".concat(n.toString(10)))
+		if (b[2] === "1") {
+			checkbox.checked = true;
+		} else {
+			checkbox.checked = false;
+		}
+		check_bug(n)
+
+		n = i*5 + 3
+		checkbox = document.getElementById("check-".concat(n.toString(10)))
+		if (b[1] === "1") {
+			checkbox.checked = true;
+		} else {
+			checkbox.checked = false;
+		}
+		check_bug(n)
+
+		n = i*5 + 4
+		checkbox = document.getElementById("check-".concat(n.toString(10)))
+		if (b[0] === "1") {
+			checkbox.checked = true;
+		} else {
+			checkbox.checked = false;
+		}
+		check_bug(n)
+	}
+
+	password = p
+}
+
+
+function bug_load_pass_button() {
+	console.log(document.getElementById("bugpassword").value)
+	bug_load_pass(document.getElementById("bugpassword").value)
+}
+
+
+
+</script>
+</head>
+
+<body onLoad="uncheck()" style="background-color:black; color: white;">
+
+	<INPUT type="text" id="bugpassword" />
+	<button type="button" onclick="bug_load_pass_button()">Load</button>
+
+
+	<br />
+	<br />
+	<select id="months">
+		<option value="1">January</option>
+		<option value="2">February</option>
+		<option value="3">March</option>
+		<option value="4">April</option>
+		<option value="5">May</option>
+		<option value="6">June</option>
+		<option value="7">July</option>
+		<option value="8">August</option>
+		<option value="9">September</option>
+		<option value="10">October</option>
+		<option value="11">November</option>
+		<option value="12">December</option>
+	</select>
+	<br />
+	<br />
+
+	<table>
+		<tr>
+			<th><input type="checkbox" id="check-0" onclick="check_bug(0)" /></th>
+			<th><input type="checkbox" id="check-5" onclick="check_bug(5)" /></th>
+			<th><input type="checkbox" id="check-10" onclick="check_bug(10)" /></th>
+			<th><input type="checkbox" id="check-15" onclick="check_bug(15)" /></th>
+			<th><input type="checkbox" id="check-20" onclick="check_bug(20)" /></th>
+			<th><input type="checkbox" id="check-25" onclick="check_bug(25)" /></th>
+			<th><input type="checkbox" id="check-30" onclick="check_bug(30)" /></th>
+			<th><input type="checkbox" id="check-35" onclick="check_bug(35)" /></th>
+			<th><input type="checkbox" id="check-40" onclick="check_bug(40)" /></th>
+			<th><input type="checkbox" id="check-45" onclick="check_bug(45)" /></th>
+			<th><input type="checkbox" id="check-50" onclick="check_bug(50)" /></th>
+			<th><input type="checkbox" id="check-55" onclick="check_bug(55)" /></th>
+			<th><input type="checkbox" id="check-60" onclick="check_bug(60)" /></th>
+			<th><input type="checkbox" id="check-65" onclick="check_bug(65)" /></th>
+			<th><input type="checkbox" id="check-70" onclick="check_bug(70)" /></th>
+			<th><input type="checkbox" id="check-75" onclick="check_bug(75)" /></th>
+		</tr>
+		<tr>
+			<th><input type="checkbox" id="check-1" onclick="check_bug(1)" /></th>
+			<th><input type="checkbox" id="check-6" onclick="check_bug(6)" /></th>
+			<th><input type="checkbox" id="check-11" onclick="check_bug(11)" /></th>
+			<th><input type="checkbox" id="check-16" onclick="check_bug(16)" /></th>
+			<th><input type="checkbox" id="check-21" onclick="check_bug(21)" /></th>
+			<th><input type="checkbox" id="check-26" onclick="check_bug(26)" /></th>
+			<th><input type="checkbox" id="check-31" onclick="check_bug(31)" /></th>
+			<th><input type="checkbox" id="check-36" onclick="check_bug(36)" /></th>
+			<th><input type="checkbox" id="check-41" onclick="check_bug(41)" /></th>
+			<th><input type="checkbox" id="check-46" onclick="check_bug(46)" /></th>
+			<th><input type="checkbox" id="check-51" onclick="check_bug(51)" /></th>
+			<th><input type="checkbox" id="check-56" onclick="check_bug(56)" /></th>
+			<th><input type="checkbox" id="check-61" onclick="check_bug(61)" /></th>
+			<th><input type="checkbox" id="check-66" onclick="check_bug(66)" /></th>
+			<th><input type="checkbox" id="check-71" onclick="check_bug(71)" /></th>
+			<th><input type="checkbox" id="check-76" onclick="check_bug(76)" /></th>
+		</tr>
+		<tr>
+			<th><input type="checkbox" id="check-2" onclick="check_bug(2)" /></th>
+			<th><input type="checkbox" id="check-7" onclick="check_bug(7)" /></th>
+			<th><input type="checkbox" id="check-12" onclick="check_bug(12)" /></th>
+			<th><input type="checkbox" id="check-17" onclick="check_bug(17)" /></th>
+			<th><input type="checkbox" id="check-22" onclick="check_bug(22)" /></th>
+			<th><input type="checkbox" id="check-27" onclick="check_bug(27)" /></th>
+			<th><input type="checkbox" id="check-32" onclick="check_bug(32)" /></th>
+			<th><input type="checkbox" id="check-37" onclick="check_bug(37)" /></th>
+			<th><input type="checkbox" id="check-42" onclick="check_bug(42)" /></th>
+			<th><input type="checkbox" id="check-47" onclick="check_bug(47)" /></th>
+			<th><input type="checkbox" id="check-52" onclick="check_bug(52)" /></th>
+			<th><input type="checkbox" id="check-57" onclick="check_bug(57)" /></th>
+			<th><input type="checkbox" id="check-62" onclick="check_bug(62)" /></th>
+			<th><input type="checkbox" id="check-67" onclick="check_bug(67)" /></th>
+			<th><input type="checkbox" id="check-72" onclick="check_bug(72)" /></th>
+			<th><input type="checkbox" id="check-77" onclick="check_bug(77)" /></th>
+		</tr>
+		<tr>
+			<th><input type="checkbox" id="check-3" onclick="check_bug(3)" /></th>
+			<th><input type="checkbox" id="check-8" onclick="check_bug(8)" /></th>
+			<th><input type="checkbox" id="check-13" onclick="check_bug(13)" /></th>
+			<th><input type="checkbox" id="check-18" onclick="check_bug(18)" /></th>
+			<th><input type="checkbox" id="check-23" onclick="check_bug(23)" /></th>
+			<th><input type="checkbox" id="check-28" onclick="check_bug(28)" /></th>
+			<th><input type="checkbox" id="check-33" onclick="check_bug(33)" /></th>
+			<th><input type="checkbox" id="check-38" onclick="check_bug(38)" /></th>
+			<th><input type="checkbox" id="check-43" onclick="check_bug(43)" /></th>
+			<th><input type="checkbox" id="check-48" onclick="check_bug(48)" /></th>
+			<th><input type="checkbox" id="check-53" onclick="check_bug(53)" /></th>
+			<th><input type="checkbox" id="check-58" onclick="check_bug(58)" /></th>
+			<th><input type="checkbox" id="check-63" onclick="check_bug(63)" /></th>
+			<th><input type="checkbox" id="check-68" onclick="check_bug(68)" /></th>
+			<th><input type="checkbox" id="check-73" onclick="check_bug(73)" /></th>
+			<th><input type="checkbox" id="check-78" onclick="check_bug(78)" /></th>
+		</tr>
+		<tr>
+			<th><input type="checkbox" id="check-4" onclick="check_bug(4)" /></th>
+			<th><input type="checkbox" id="check-9" onclick="check_bug(9)" /></th>
+			<th><input type="checkbox" id="check-14" onclick="check_bug(14)" /></th>
+			<th><input type="checkbox" id="check-19" onclick="check_bug(19)" /></th>
+			<th><input type="checkbox" id="check-24" onclick="check_bug(24)" /></th>
+			<th><input type="checkbox" id="check-29" onclick="check_bug(29)" /></th>
+			<th><input type="checkbox" id="check-34" onclick="check_bug(34)" /></th>
+			<th><input type="checkbox" id="check-39" onclick="check_bug(39)" /></th>
+			<th><input type="checkbox" id="check-44" onclick="check_bug(44)" /></th>
+			<th><input type="checkbox" id="check-49" onclick="check_bug(49)" /></th>
+			<th><input type="checkbox" id="check-54" onclick="check_bug(54)" /></th>
+			<th><input type="checkbox" id="check-59" onclick="check_bug(59)" /></th>
+			<th><input type="checkbox" id="check-64" onclick="check_bug(64)" /></th>
+			<th><input type="checkbox" id="check-69" onclick="check_bug(69)" /></th>
+			<th><input type="checkbox" id="check-74" onclick="check_bug(74)" /></th>
+			<th><input type="checkbox" id="check-79" onclick="check_bug(79)" /></th>
+		</tr>
+	</table>
+
+	<br/>
+
+	<button type="button" onclick="run_bug()">Go</button>
+
+	<br/>
+	<br/>
+
+	<table id="bug-table">
+		<tbody>
+		</tbody>
+	</table>
+
+
+</body>
+
+</html>
+
